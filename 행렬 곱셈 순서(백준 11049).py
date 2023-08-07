@@ -1,18 +1,26 @@
 N = int(input())
-matrix = [list(map(int, input().split(" "))) for _ in range(N)]
-dp = [[0] * N for _ in range(N)]
+rows = []
+cols = []
+for _ in range(N):
+    r, c = map(int, input().split(" "))
+    rows.append(r)
+    cols.append(c)
+dp = [[2**31 - 1] * N for _ in range(N)]
 
-for cnt in range(N - 1):
-    for i in range(N - cnt - 1):
-        j = i + cnt + 1
-        dp[i][j] = 2**31
-        for k in range(i, j):
-            dp[i][j] = min(
-                dp[i][j],
-                dp[i][k] + dp[k + 1][j] + matrix[i][0] * matrix[k][1] * matrix[j][1],
-            )
+for cnt in range(N):
+    for i in range(N - cnt):
+        j = i + cnt
+        if cnt == 0:
+            dp[i][j] = 0
+        else:
+            for k in range(i, j):
+                dp[i][j] = min(
+                    dp[i][j],
+                    dp[i][k] + dp[k + 1][j] + rows[i] * cols[j] * cols[k],
+                )
 
 print(dp[0][-1])
+
 
 # 문제를 접근하는 방법을 항상 기억하자!
 # 시간, 공간 복잡도 생각
