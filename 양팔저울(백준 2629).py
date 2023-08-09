@@ -1,41 +1,36 @@
-def findWeigh(ball, dp):
-    if dp[k][ball] == 1:
-        return "Y"
-    else:
-        for i in range(1,len(dp[k])):
-            if dp[k][i] == 1:
-                if i+ball < len(dp[k]):
-                    if dp[k][i+ball] == 1:
-                        return "Y"
-    
-    return "N"
-
-N = int(input())#추 개수
+N = int(input())
 weighs = list(map(int, input().split(" ")))
-M = int(input())#구슬 개수
-balls = list(map(int, input().split(" ")))
 
-dp = [[0]*(40_001) for _ in range(N)]
+totalWeigh = sum(weighs)
 
-for k in range(N):
-    w = weighs[k]
-    if k == 0:
-        dp[k][w] = 1
-    else:
-        dp[k][w] = 1        
-        for i in range(1,len(dp[k])):
-            if i+w < len(dp[k]):
-                if dp[k-1][i] == 1:
-                    dp[k][i+w] = 1            
-                    dp[k][i] = 1
+M = int(input())
+sphere = list(map(int, input().split(" ")))
 
+dp = [[0] * (totalWeigh + 1) for _ in range(N)]
+dp[0][weighs[0]] = 1
 results = []
-for b in balls:
-    results.append(findWeigh(b, dp))
+for i in range(1, N):
+    dp[i][weighs[i]] = 1
+    for j in range(1, totalWeigh + 1):
+        if dp[i - 1][j] == 1:
+            dp[i][j] = 1
+            if (j + weighs[i]) <= totalWeigh:
+                dp[i][j + weighs[i]] = 1
 
-for r in results:
-    print(r, end=" ")
-print()
+for s in sphere:
+    if s <= totalWeigh:
+        if dp[N - 1][s] == 1:
+            results.append("Y")
+        else:
+            for j in range(1, totalWeigh + 1):
+                if dp[N - 1][j] == 1 and j + s <= totalWeigh:
+                    if dp[N - 1][j + s] == 1:
+                        results.append("Y")
+                        break
+                elif j + s > totalWeigh:
+                    results.append("N")
+                    break
+    else:
+        results.append("N")
 
-#하나의 배열만을 이용해 dp를 하여 업데이트할 경우 업데이트되는 값이 이전 값으로 들어가 반영되면
-#업데이트 과정이 꼬이게 됨을 유의한다. 정 안될 경우 2D 배열을 써서 이전 결과와 현재 결과를 분리해서 사용
+print(*results)
