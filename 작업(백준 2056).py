@@ -1,19 +1,16 @@
-import sys
-def input():
-    return sys.stdin.readline().rstrip()
-
 N = int(input())
-dp = [0]*N
-for k in range(N):
-    tmp = input().split(" ")
-    
-    cost = int(tmp[0])
-    priority = int(tmp[1])
-    
-    if priority >= 1:
-        for i in range(2,priority+2):
-            dp[k] = max(dp[int(tmp[i])-1], dp[k])
-        dp[k] += cost
+dp = [0] * (N + 1)
+
+for i in range(1, N + 1):
+    tmps = list(map(int, input().split(" ")))
+    consumed_time = tmps[0]
+    numberOfDep = tmps[1]
+
+    if i == 1:
+        dp[i] = consumed_time
     else:
-        dp[k] = cost
+        for j in range(numberOfDep):
+            dp[i] = max(dp[i], dp[tmps[j + 2]])
+        dp[i] += consumed_time
+
 print(max(dp))
