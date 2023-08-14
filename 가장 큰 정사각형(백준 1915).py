@@ -1,21 +1,24 @@
-n,m = map(int, input().split(" "))
-board = [[0]*m for _ in range(n)]
-dp = [[0]*m for _ in range(n)]
-for i in range(n):
-    row = input()
-    for j in range(m):
-        board[i][j] = int(row[j])
+n, m = map(int, input().split(" "))
+board = [list(map(int, input())) for _ in range(n)]
+moves = [[0, -1], [-1, -1], [-1, 0]]
+dp = [board[i][0:] for i in range(n)]
 
+result = 0
 for i in range(n):
     for j in range(m):
-        if i == 0 or j == 0:
-            dp[i][j] = board[i][j]
-        elif board[i][j] == 0:
-            dp[i][j] = 0
-        else:
-            dp[i][j] = min(dp[i-1][j], dp[i-1][j-1],dp[i][j-1]) + 1
+        if board[i][j] == 1:
+            tmp = 1e9
+            for dx, dy in moves:
+                if 0 <= i + dx < n and 0 <= j + dy < m:
+                    if dp[i + dx][j + dy] >= 1:
+                        tmp = min(tmp, dp[i + dx][j + dy])
+                    else:
+                        tmp = 0
+                        break
+                else:
+                    tmp = 0
+                    break
+            dp[i][j] += tmp
+            result = max(result, dp[i][j])
 
-answer = 0
-for i in range(n):
-    answer = max(max(dp[i]), answer)
-print(answer*answer)
+print(result**2)
