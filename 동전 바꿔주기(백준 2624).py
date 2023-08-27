@@ -1,21 +1,19 @@
 T = int(input())
 k = int(input())
-coin = [[0, 0]]
-dp = [[0 for _ in range(T+1)] for _ in range(k+1)]
-for _ in range(k):
-    x, y = map(int, input().split())
-    coin.append([x, y])
 
-dp[0][0] = 1
-for i in range(1, k+1):
-    val, cnt = coin[i]
-    for j in range(T+1):
-        dp[i][j] = dp[i-1][j]
-        for v in range(1, cnt+1):
-            if j-v*val >= 0:
-                dp[i][j] += dp[i-1][j-v*val]
-            else:
-                break
+dp = [[0] * (T + 1) for _ in range(k + 1)]
 
-print(dp)
-print(dp[k][T])
+for i in range(1, k + 1):
+    p, n = map(int, input().split())
+
+    dp[i] = dp[i - 1][:]
+    for l in range(1, n + 1):
+        val = l * p
+
+        for j in range(1, T + 1 - val):
+            if dp[i - 1][j] >= 1 and j + val <= T:
+                dp[i][j + val] += dp[i - 1][j]
+        if val <= T:
+            dp[i][val] += 1
+
+print(dp[-1][-1])
