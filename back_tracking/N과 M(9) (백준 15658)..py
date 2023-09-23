@@ -22,3 +22,4 @@ def printSequence(numbers, count):
 
 
 printSequence([], 0)
+# 중복된 수열을 체크하는 방법 유의
