@@ -1,31 +1,31 @@
-import sys
-
-sys.setrecursionlimit(10**5)
+from collections import deque
 
 N, K = map(int, input().split())
-visited = [False] * (K + 1)
+visited = [False] * (100_001)
 
 
-def dfs(pos, count):
-    result = K + 1
-    if pos == K:
-        return count
-    if 0 <= pos - 1 < K + 1 and not visited[pos - 1]:
-        visited[pos - 1] = True
-        result = min(dfs(pos - 1, count + 1), result)
-        visited[pos - 1] = False
-    if 0 <= pos + 1 < K + 1 and not visited[pos + 1]:
-        visited[pos + 1] = True
-        result = min(dfs(pos + 1, count + 1), result)
-        visited[pos + 1] = False
-    if 0 <= 2 * pos < K + 1 and not visited[2 * pos]:
-        visited[2 * pos] = True
-        result = min(dfs(2 * pos, count), result)
-        visited[2 * pos] = False
+def bfs():
+    moves = [-1, 1]
+    queue = deque([[N, 0]])
+    visited[N] = True
 
-    return result
+    while queue:
+        pos, count = queue.popleft()
+        if pos == K:
+            return count
+        if 0 <= 2 * pos < 100_001 and not visited[2 * pos]:
+            visited[2 * pos] = True
+            queue.appendleft([2 * pos, count])
+        for m in moves:
+            if 0 <= pos + m < 100_001 and not visited[m + pos]:
+                visited[m + pos] = True
+                queue.append([m + pos, count + 1])
+
+    return 0
 
 
-visited[N] = True
-result = dfs(N, 0)
+result = bfs()
 print(result)
+
+# 2*pos는 count가 증가하지 않기에 큐 맨 앞에 넣어서 count 시점을 모두 동일하게 가져가는 bfs에 맞게 한다.
+# -1을 1보다 먼저 처리하여야 N 이전 값들도 2*pos에 영향을 받을 수 있게된다.
