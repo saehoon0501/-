@@ -29,10 +29,9 @@ class Rabbit:
 
 
 class Slot:
-    def __init__(self, x, y, pid):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.pid = pid
 
     def __repr__(self) -> str:
         return f"Slot X{self.x}, Y{self.y}"
@@ -104,7 +103,7 @@ def moveRabbit():
     d, currentX = moveDown(d, current[0])
     d, currentX = moveUp(d, currentX)
     d, currentX = moveDown(d, currentX)
-    results.append(Slot(currentX, current[1], 0))
+    results.append(Slot(currentX, current[1]))
 
     # 오른쪽
     d = (rabbit.dist) % (2 * (M - 1))
@@ -112,7 +111,7 @@ def moveRabbit():
     d, currentY = moveRight(d, current[1])
     d, currentY = moveLeft(d, currentY)
     d, currentY = moveRight(d, currentY)
-    results.append(Slot(current[0], currentY, 0))
+    results.append(Slot(current[0], currentY))
 
     # 왼쪽
     d = (rabbit.dist) % (2 * (M - 1))
@@ -120,7 +119,7 @@ def moveRabbit():
     d, currentY = moveLeft(d, current[1])
     d, currentY = moveRight(d, currentY)
     d, currentY = moveLeft(d, currentY)
-    results.append(Slot(current[0], currentY, 0))
+    results.append(Slot(current[0], currentY))
 
     # 위쪽
     d = (rabbit.dist) % (2 * (N - 1))
@@ -128,7 +127,7 @@ def moveRabbit():
     d, currentX = moveUp(d, current[0])
     d, currentX = moveDown(d, currentX)
     d, currentX = moveUp(d, currentX)
-    results.append(Slot(currentX, current[1], 0))
+    results.append(Slot(currentX, current[1]))
 
     heapq.heapify(results)
     slot = heapq.heappop(results)
@@ -144,8 +143,33 @@ def moveRabbit():
 def multiplyDist(pid, L):
     rabbit = hash[pid]
     rabbit.dist *= L
-
     return
+
+
+def getWinner():
+    pid, sum, maxX = 0, -1, -1
+    for rabbit in hasJumped.values():
+        if rabbit.coord[0] + rabbit.coord[1] > sum:
+            pid, sum, maxX = (
+                rabbit.pid,
+                rabbit.coord[0] + rabbit.coord[1],
+                rabbit.coord[0],
+            )
+        elif rabbit.coord[0] + rabbit.coord[1] == sum:
+            if rabbit.coord[0] > maxX:
+                pid, sum, maxX = (
+                    rabbit.pid,
+                    rabbit.coord[0] + rabbit.coord[1],
+                    rabbit.coord[0],
+                )
+            elif rabbit.coord[0] == maxX:
+                if rabbit.pid > pid:
+                    pid, sum, maxX = (
+                        rabbit.pid,
+                        rabbit.coord[0] + rabbit.coord[1],
+                        rabbit.coord[0],
+                    )
+    return pid
 
 
 for _ in range(Q - 1):
@@ -159,11 +183,7 @@ for _ in range(Q - 1):
             moveRabbit()
             count += 1
         # 점수 S를 준다.
-        results = []
-        for rabbit in hasJumped.values():
-            results.append(Slot(rabbit.coord[0], rabbit.coord[1], rabbit.pid))
-        heapq.heapify(results)
-        rabbit = hash[heapq.heappop(results).pid]
+        rabbit = hash[getWinner()]
         rabbit.score += cmd[2]
 
     elif cmd[0] == 300:
