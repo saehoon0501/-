@@ -1,34 +1,31 @@
-import sys
-
-sys.setrecursionlimit(10**5)
-
 n = int(input())
-val = [-1] * (10_001)
-visited = [False] * (10_001)
 adjacents = [[] for _ in range(n + 1)]
 
 for _ in range(n - 1):
-    parent, child, weight = map(int, input().split())
-    adjacents[parent].append([child, weight])
+    a, b, weight = map(int, input().split())
+    adjacents[a].append((b, weight))
+    adjacents[b].append((a, weight))
 
 
-def dfs(node):
-    results = []
-    visited[node] = True
-    for c, w in adjacents[node]:
-        if not visited[c]:
-            results.append(dfs(c) + w)
+def dfs(i):
+    stack = [(i, 0)]
+    visited = [False] * (n + 1)
+    result = (0, 0)
+    visited[i] = True
+    while stack:
+        current, acc = stack.pop()
+        for adjacent, weight in adjacents[current]:
+            if visited[adjacent]:
+                continue
+            if acc + weight > result[1]:
+                result = (adjacent, acc + weight)
+            visited[adjacent] = True
+            stack.append((adjacent, acc + weight))
 
-    if len(results) == 0:
-        val[node] = 0
-        return 0
-    results.sort(reverse=True)
-    if len(results) == 1:
-        val[node] = results[0]
-    else:
-        val[node] = results[0] + results[1]
-    return max(results)
+    return result
 
 
-dfs(1)
-print(max(val))
+mx, _ = dfs(1)
+_, result = dfs(mx)
+
+print(result)
